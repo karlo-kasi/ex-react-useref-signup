@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = `!@#$%^&*()-_=+[]{}|;:'\\",.<>?/~`;
 
 function App() {
 
   //gestione pop up
   const [isOpenAlert, setIsOpenAlert] = useState(null)
-  const [valid, setValid] = useState(null)
-  const [selector, setSelector] = useState(null)
+
 
   //Gestione campi input
   const [name, setName] = useState("")
@@ -16,54 +18,71 @@ function App() {
   const [anniEsperienza, setAnniEsperienza] = useState("")
   const [descrizione, setDescrizione] = useState("")
 
-  // funzione per gestire la validazione
-  function validation() {
 
-    if (!name.trim() || !username.trim() || !password.trim() || !anniEsperienza.trim() || !descrizione.trim() ) {
-      setIsOpenAlert(true)
-      return
-    }
-    setIsOpenAlert(false)
+  const isUsernameValid = useMemo(() => {
+    const charValid = username.split("").every(char =>
+      letters.includes(char.toLowerCase()) ||
+      numbers.includes(char)
+    )
+    return charValid && username.length >= 6;
+  }, [username])
 
-    if (!(anniEsperienza > 0)) {
-      setValid(true)
-      return
-    }
-    setValid(false)
+  const isPasswordValid = useMemo(() => {
+    return (
+      password.length >= 8 &&
+      password.split("").some(chart => letters.includes(chart)) &&
+      password.split("").some(num => numbers.includes(num)) &&
+      password.split("").some(sym => symbols.includes(sym))
+    )
+  }, [password])
 
-    if (!specializzazione) {
-      setSelector(true)
-      return
-    }
-    setSelector(false)
-  }
+  const isDescriptionValid = useMemo(() => {
+    return (
+      descrizione.trim().length >= 100 &&
+      descrizione.trim().length < 1000
+    )
+  }, [descrizione])
+
 
   // funzione invio form
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    validation()
+    if (
+      !name.trim() ||
+      !username.trim() ||
+      !password.trim() ||
+      !anniEsperienza.trim() ||
+      !specializzazione ||
+      anniEsperienza <= 0 ||
+      !descrizione.trim() ||
+      !isUsernameValid ||
+      !isPasswordValid ||
+      !isDescriptionValid
+    ) {
+      return setIsOpenAlert(true)
+    } else {
+      console.log({
+        Nome: name,
+        Username: username,
+        Password: password,
+        Specializzazione: specializzazione,
+        AnnidiEsperienza: anniEsperienza,
+        Descrizione: descrizione
+      })
+    }
 
-    console.log(
-      `
-      Nome: ${name}
-      Username: ${username}
-      Password: ${password}
-      Specializzazione: ${specializzazione}
-      Anni di Esperienza: ${anniEsperienza}
-      Descrizione: ${descrizione}
-      `)
+
 
   }
 
   return (
     <>
-      <div className='container d-flex justify-content-center'>
-        <div className='row'>
-          <div className='col-12 my-5 border rounded-1 p-4'>
-
+      <div className='container '>
+        <div className='row d-flex justify-content-center'>
+          <div className="col-12 col-md-8 col-lg-6 my-5 border rounded-1 p-4">
             <div>
-              <h2 className='mb-3 text center'>COMPILA IL MODULO</h2>
+              <h2 className='mb-3 text-center'>COMPILA IL MODULO</h2>
               <form
                 onSubmit={handleSubmit}
               >
@@ -94,6 +113,13 @@ function App() {
                     className="form-control"
                     placeholder="Inserisci un username"
                   />
+                  {username.trim() && (
+                    <div>
+                      <p className={isUsernameValid ? "text-success" : "text-danger"}>
+                        {isUsernameValid ? "Username valido" : "Inserisci un Username valido (min. 6 caratteri, una lettera e un numero)."}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Password</label>
@@ -104,6 +130,13 @@ function App() {
                     className="form-control"
                     placeholder="Inserisci la tua password"
                   />
+                  {password.trim() && (
+                    <div>
+                      <p className={isPasswordValid ? "text-success" : "text-danger"}>
+                        {isPasswordValid ? "Password Valida" : "Password NON valida (min. 8 caratteri, una lettera e un numero e un carattere speciale)."}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Specializzazione</label>
@@ -118,11 +151,7 @@ function App() {
                     <option value="frontend">Frontend</option>
                     <option value="backend">Backend</option>
                   </select>
-                  {selector && (
-                    <div className="text-danger">
-                      Seleziona una casella.
-                    </div>
-                  )}
+
 
                 </div>
                 <div className="mb-3">
@@ -134,23 +163,28 @@ function App() {
                     className="form-control"
                     placeholder="Inserisci gli ammi di esperienza"
                   />
-                  {valid && (
-                    <div className="text-danger">
-                      Metti un numero Valido.
-                    </div>
-                  )}
+
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Breve descrizione sullo sviluppatore</label>
                   <textarea
                     className="form-control"
-                    rows="3"
+                    rows="6"
                     value={descrizione}
                     onChange={e => setDescrizione(e.target.value)}
                   >
                   </textarea>
+
+                  {descrizione.trim() && (
+                    <div>
+                      <p className={isDescriptionValid ? "text-success" : "text-danger"}>
+                        {isDescriptionValid ? "Descrizione Valida" : `Inserisci una descrizione completa (min. 100 caratteri)${descrizione.length}`}
+                      </p>
+                    </div>
+                  )}
+
                 </div>
-                <div className='d-grid mb-3'>
+                <div className='d-grid mb-4'>
                   <button
                     className='btn btn-primary'
                     type="submit"
