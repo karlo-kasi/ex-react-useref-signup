@@ -58,7 +58,7 @@ function App() {
       !password.trim() ||
       !inputAnniEserienza.current.value.trim() ||
       !inputSelect.current.value.trim() ||
-      anniEsperienza <= 0 ||
+      inputAnniEserienza.current.value <= 0 ||
       !descrizione.trim() ||
       !isUsernameValid ||
       !isPasswordValid ||
