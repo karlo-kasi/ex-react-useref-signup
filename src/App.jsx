@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
@@ -6,16 +6,20 @@ const symbols = `!@#$%^&*()-_=+[]{}|;:'\\",.<>?/~`;
 
 function App() {
 
+  console.log("render")
   //gestione pop up
   const [isOpenAlert, setIsOpenAlert] = useState(null)
 
 
   //Gestione campi input
-  const [name, setName] = useState("")
+  const inputName = useRef()
+  // const [name, setName] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [specializzazione, setSpecializzazione] = useState("")
-  const [anniEsperienza, setAnniEsperienza] = useState("")
+  const inputSelect = useRef()
+  // const [specializzazione, setSpecializzazione] = useState("")
+  const inputAnniEserienza = useRef()
+  // const [anniEsperienza, setAnniEsperienza] = useState("")
   const [descrizione, setDescrizione] = useState("")
 
 
@@ -49,11 +53,11 @@ function App() {
     e.preventDefault()
 
     if (
-      !name.trim() ||
+      !inputName.current.value.trim() ||
       !username.trim() ||
       !password.trim() ||
-      !anniEsperienza.trim() ||
-      !specializzazione ||
+      !inputAnniEserienza.current.value.trim() ||
+      !inputSelect.current.value.trim() ||
       anniEsperienza <= 0 ||
       !descrizione.trim() ||
       !isUsernameValid ||
@@ -63,11 +67,11 @@ function App() {
       return setIsOpenAlert(true)
     } else {
       console.log({
-        Nome: name,
+        Nome: inputName.current.value,
         Username: username,
         Password: password,
-        Specializzazione: specializzazione,
-        AnnidiEsperienza: anniEsperienza,
+        Specializzazione: inputSelect.current.value,
+        AnnidiEsperienza: inputAnniEserienza.current.value,
         Descrizione: descrizione
       })
     }
@@ -98,8 +102,7 @@ function App() {
                   <label className="form-label">Nome Completo</label>
                   <input
                     type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
+                    ref={inputName}
                     className="form-control"
                     placeholder="Inserisci il tuo nome"
                   />
@@ -141,8 +144,9 @@ function App() {
                 <div className="mb-3">
                   <label className="form-label">Specializzazione</label>
                   <select
-                    value={specializzazione}
-                    onChange={(e) => setSpecializzazione(e.target.value)}
+                    ref={inputSelect}
+                    // value={specializzazione}
+                    // onChange={(e) => setSpecializzazione(e.target.value)}
                     className="form-select"
                     aria-label="Default select example"
                   >
@@ -158,8 +162,7 @@ function App() {
                   <label className="form-label">Anni di esperienza</label>
                   <input
                     type="number"
-                    value={anniEsperienza}
-                    onChange={e => setAnniEsperienza(e.target.value)}
+                    ref={inputAnniEserienza}
                     className="form-control"
                     placeholder="Inserisci gli ammi di esperienza"
                   />
